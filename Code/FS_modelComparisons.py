@@ -192,12 +192,12 @@ Top_IF_feats = IF_feats_Post_FS
 Top_NIF_IF_feats =  Top_NIF_feats + Top_IF_feats
 
 totalScriptsDF_both_ifnif = totalScriptsDF_both_ifnif.loc[:,~totalScriptsDF_both_ifnif.columns.duplicated()]
-#^count: 46 (23 NIFs + 23 IFs)
+#^count: 46 (23 NIFs + 25 IFs)
 
 ###############################################################################
 #               Input features to DF and set predictor/target variables     
 ###############################################################################
-x_featList_to_use_x = IF_feats_Pre_FS #######-------Insert Feat List from above here------######
+x_featList_to_use_x = Top_IF_feats #######-------Insert Feat List from above here------######
 
 feat_len = len(x_featList_to_use_x)
 feature_names_pred = x_featList_to_use_x
