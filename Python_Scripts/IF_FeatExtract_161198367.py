@@ -430,22 +430,22 @@ for root, dirs, filenames in os.walk(indir):
             #************************************************
             #       Avg Answer Length & Count of questions
             #************************************************ 
-            i=0
-            while(i < len(allUtterances)-1):
-                words = allUtterances[i].split(" ")
-                if(words[0].startswith("*INV") and "?" in words):
-                    quesCountINV += 1
-                    ansWordLen += len(allUtterances[i+1])
-                if(words[0].startswith("*PAR") and "?" in words):
-                    quesCountPAR += 1
-                elif(words[0].startswith("*PAR")):
-                    parWordCount += len(allUtterances)
-                i=i+1
-            
-            if quesCountINV != 0:
-                avgAnsWordLen = ansWordLen/quesCountINV
-            else:
-                avgAnsWordLen = parWordCount
+#            i=0
+#            while(i < len(allUtterances)-1):
+#                words = allUtterances[i].split(" ")
+#                if(words[0].startswith("*INV") and "?" in words):
+#                    quesCountINV += 1
+#                    ansWordLen += len(allUtterances[i+1])
+#                if(words[0].startswith("*PAR") and "?" in words):
+#                    quesCountPAR += 1
+#                elif(words[0].startswith("*PAR")):
+#                    parWordCount += len(allUtterances)
+#                i=i+1
+#            
+#            if quesCountINV != 0:
+#                avgAnsWordLen = ansWordLen/quesCountINV
+#            else:
+#                avgAnsWordLen = parWordCount
 
             
 

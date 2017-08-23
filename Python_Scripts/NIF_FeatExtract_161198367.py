@@ -1,12 +1,26 @@
-
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Spyder Editor
+Created on 14 July 2017 at 12:29
 
-This is a temporary script file.
+@author: Claire Mary Kelleher
+MSc. Big Data Science 
+Thesis Project: Interactional and Linguistic Analysis for Computationally Diagnosing Alzheimer’s Disease
 """
 
-#************************** --Libraries-- ******************************
+"""
+Purpose of this script:
+    
+Encoding of Non-Interactional Features.
+
+Each transcript was inputted one at a time. 
+A set of variables was created, one per transcipt, in the form of a Pandas series.
+All series were merged at the end to created one DataFrame.
+This DataFrame is then saved as a pickle, where it is then transposed and used for FS & Model building.
+"""
+###############################################################################
+#               Libraries imported
+###############################################################################
 from nltk.tag import StanfordPOSTagger
 from nltk.parse import stanford
 from nltk.stem.wordnet import WordNetLemmatizer
@@ -21,7 +35,9 @@ import pandas as pd
 
 df = pd.DataFrame([])
 
-
+###############################################################################
+#               Import Stanford Tagger
+###############################################################################
 _stanford_url = 'https://nlp.stanford.edu/software/lex-parser.shtml'
 jar = '/Users/clairekelleher/Desktop/Thesis/Fromdesktop/stanford-postagger-2015-12-09/stanford-postagger.jar'
 model = '/Users/clairekelleher/Desktop/Thesis/Fromdesktop/stanford-postagger-2015-12-09/models/english-left3words-distsim.tagger'
@@ -31,6 +47,9 @@ stanford_dir = pos_tagger._stanford_jar.rpartition('/')[0]
 stanford_jars = find_jars_within_path(stanford_dir)
 pos_tagger._stanford_jar = ':'.join(stanford_jars)
 
+###############################################################################
+#               Import Stanford Parser 
+###############################################################################
 _MAIN_CLASS = 'edu.stanford.nlp.parser.lexparser.LexicalizedParser'
 os.environ['STANFORD_PARSER'] = '/Users/clairekelleher/Desktop/Thesis/Fromdesktop/stanford-parser-full-2017-06-09/stanford-parser.jar'
 os.environ['STANFORD_MODELS'] = '/Users/clairekelleher/Desktop/Thesis/Fromdesktop/stanford-parser-full-2017-06-09/stanford-parser-3.8.0-models.jar'
@@ -40,8 +59,6 @@ path_to_jar_p = "/Users/clairekelleher/Desktop/Thesis/Fromdesktop/stanford-parse
 path_to_models_jar_p = "/Users/clairekelleher/Desktop/Thesis/Fromdesktop/stanford-parser-full-2017-06-09/stanford-parser-3.8.0-models.jar"
 dependency_parser = StanfordDependencyParser(path_to_jar=path_to_jar_p, path_to_models_jar=path_to_models_jar_p)
 
-#************************** --Parser-- ******************************
-#To do: Sort out using STANFORD PARSER!
 
 from nltk.chunk.regexp import RegexpParser
 
@@ -66,13 +83,14 @@ lmtzr = WordNetLemmatizer()
 
 #fname = "002-0.cex"
 indir = '/Users/clairekelleher/Desktop/Thesis/Data/PItt_cookie_all_test'
-try:
-    for root, dirs, filenames in os.walk(indir):
+
+for root, dirs, filenames in os.walk(indir):
+    try:
         for fname in filenames[1:]:  
             fname = str(fname)
             
             
-    #        line_ct = file_len(fname) #Total lines in file
+    #        line_ct = fxile_len(fname) #Total lines in file
             
             
             
@@ -151,7 +169,7 @@ try:
             
             #Dx:  ProbableAD, PossibleAD, MCI, Memory, Vascular, Control
             
-            with open(os.path.join(root, fname), 'r') as f:
+            with open(os.path.join(root, fname), 'r', encoding='utf8') as f:
                 for line in f:
                     if line.startswith("@ID:"):
                         info = line.split("|")
@@ -165,8 +183,11 @@ try:
                             dx = 'Memory'
                         if 'Vascular' in info:
                             dx = 'Vascular'
-                        if 'Control' in info:
-                            dx = 'Control'
+                        else:
+                            dx = 'Other'
+            #************************************************
+            #Pre-processing
+            #************************************************
                     if line.startswith("*"):
                         x = re.sub('[\s]', '_',line)
                         words = re.sub('[^\w]', '', x).split("_")
@@ -443,7 +464,75 @@ try:
                 
             Total_Keywords_Mentioned = Keyword_window+Keyword_sink+Keyword_cookie+Keyword_curtain+Keyword_counter+Keyword_stool
             
-            series = pd.Series([dx, Adverb_Ct_Total,Avg_Word_Len,INV_Word_Ct,INVtoPAR_word_ratio,Keyword_cookie,Keyword_counter,Keyword_curtain,Keyword_sink,Keyword_stool,Keyword_window,Noun_Ct_Total,PAR_UTT_ct,PAR_Word_Ct,ProNoun_Ct,ProNoun_Ct,ProNoun_Noun_Ratio,Script_Letter_Ct,Script_Word_Ct,Subj_IU_Total,Total_Keywords_Mentioned,Verb_Ct_3sing,Verb_Ct_Base,Verb_Ct_Gerund,Verb_Ct_Past,Verb_Ct_Past_P,Verb_Ct_Past_T,Verb_Ct_Total,Verb_Ct_non3sing,cos_avg,wordsOnceOverTotal,wordsUsedOnce], name = fname)
+            series = pd.Series([dx
+                                ,Adverb_Ct_Total
+                                ,Avg_Word_Len
+                                ,INV_Word_Ct
+                                ,INVtoPAR_word_ratio
+                                ,Keyword_cookie
+                                ,Keyword_counter
+                                ,Keyword_curtain
+                                ,Keyword_sink
+                                ,Keyword_stool
+                                ,Keyword_window
+                                ,Noun_Ct_Total
+                                ,PAR_UTT_ct
+                                ,PAR_Word_Ct
+                                ,ProNoun_Ct
+                                ,ProNoun_Ct
+                                ,ProNoun_Noun_Ratio
+                                ,Script_Letter_Ct
+                                ,Script_Word_Ct,Subj_IU_Total
+                                ,Total_Keywords_Mentioned
+                                ,Verb_Ct_3sing
+                                ,Verb_Ct_Base
+                                ,Verb_Ct_Gerund
+                                ,Verb_Ct_Past
+                                ,Verb_Ct_Past_P
+                                ,Verb_Ct_Past_T
+                                ,Verb_Ct_Total
+                                ,Verb_Ct_non3sing
+                                ,cos_avg
+                                ,wordsOnceOverTotal
+                                ,wordsUsedOnce]
+                                , name = fname)
             df = pd.concat([df, series], axis=1)
-except Exception:
-    pass
+    except IOError as e:
+        print("I/O error({0}): {1}".format(e.errno, e.strerror))
+#    except: #handle other exceptions such as attribute errors
+#        print("Unexpected error:", sys.exc_info()[0])
+
+NIF_feats_names=['dx'
+                                ,'Adverb_Ct_Total'
+                                ,'Avg_Word_Len'
+                                ,'INV_Word_Ct'
+                                ,'INVtoPAR_word_ratio'
+                                ,'Keyword_cookie'
+                                ,'Keyword_counter'
+                                ,'Keyword_curtain'
+                                ,'Keyword_sink'
+                                ,'Keyword_stool'
+                                ,'Keyword_window'
+                                ,'Noun_Ct_Total'
+                                ,'PAR_UTT_ct'
+                                ,'PAR_Word_Ct'
+                                ,'ProNoun_Ct'
+                                ,'ProNoun_Ct'
+                                ,'ProNoun_Noun_Ratio'
+                                ,'Script_Letter_Ct'
+                                ,'Script_Word_Ct,Subj_IU_Total'
+                                ,'Total_Keywords_Mentioned'
+                                ,'Verb_Ct_3sing'
+                                ,'Verb_Ct_Base'
+                                ,'Verb_Ct_Gerund'
+                                ,'Verb_Ct_Past'
+                                ,'Verb_Ct_Past_P'
+                                ,'Verb_Ct_Past_T'
+                                ,'Verb_Ct_Total'
+                                ,'Verb_Ct_non3sing'
+                                ,'cos_avg'
+                                ,'wordsOnceOverTotal'
+                                ,'wordsUsedOnce']
+
+df.to_pickle('/Users/clairekelleher/Desktop/Thesis/Data/nif_missing_feat_name.pkl')
+df_missing = df.transpose()

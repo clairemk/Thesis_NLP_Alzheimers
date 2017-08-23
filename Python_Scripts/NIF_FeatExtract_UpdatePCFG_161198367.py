@@ -1,31 +1,47 @@
-
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""
-Spyder Editor
 
-This is a temporary script file.
+"""
+Created on 16 Aug 2017, 13:28
+
+@author: Claire Mary Kelleher
+MSc. Big Data Science 
+Thesis Project: Interactional and Linguistic Analysis for Computationally Diagnosing Alzheimer’s Disease
 """
 
-#************************** --Libraries-- ******************************
+"""
+Purpose of this script:
+    
+Encoding of PCFG parsing based variables. (Added to rest of NIF's when converted from pickle for FS & Model building)
+
+Each transcript was inputted one at a time. 
+A set of variables was created, one per transcipt, in the form of a Pandas series.
+All series were merged at the end to created one DataFrame.
+This DataFrame is then saved as a pickle, where it is then transposed and used for FS & Model building.
+
+"""
+
+###############################################################################
+#               Libraries imported
+###############################################################################
 from nltk.tag import StanfordPOSTagger
 from nltk.parse import stanford
 from nltk.stem.wordnet import WordNetLemmatizer
-import re
 import os
-from sklearn.feature_extraction.text import TfidfVectorizer
-from nltk.corpus import words as wd
 from nltk.parse.stanford import StanfordDependencyParser
 from nltk.internals import find_jars_within_path
-from nltk.corpus import wordnet as wn
 import pandas as pd
-import os
-from nltk.parse import stanford
 from nltk.tree import ParentedTree
 
-
+###############################################################################
+#   Create Final Data Frame - will hold variables created per transcript
+###############################################################################
 df = pd.DataFrame([])
 
-#************************** --STANFORD POS TAGGER-- ******************************
+###############################################################################
+#               STANFORD POS TAGGER
+###############################################################################
+
 _stanford_url = 'https://nlp.stanford.edu/software/lex-parser.shtml'
 jar = '/Users/clairekelleher/Desktop/Thesis/Fromdesktop/stanford-postagger-2015-12-09/stanford-postagger.jar'
 model = '/Users/clairekelleher/Desktop/Thesis/Fromdesktop/stanford-postagger-2015-12-09/models/english-left3words-distsim.tagger'
@@ -35,7 +51,10 @@ stanford_dir = pos_tagger._stanford_jar.rpartition('/')[0]
 stanford_jars = find_jars_within_path(stanford_dir)
 pos_tagger._stanford_jar = ':'.join(stanford_jars)
 
-#************************** --STANFORD PARSER-- **********************************
+###############################################################################
+#               STANFORD PARSER
+###############################################################################
+
 _MAIN_CLASS = 'edu.stanford.nlp.parser.lexparser.LexicalizedParser'
 os.environ['STANFORD_PARSER'] = '/Users/clairekelleher/Desktop/Thesis/Fromdesktop/stanford-parser-full-2017-06-09/jars'
 os.environ['STANFORD_MODELS'] = '/Users/clairekelleher/Desktop/Thesis/Fromdesktop/stanford-parser-full-2017-06-09/jars'
@@ -47,37 +66,25 @@ path_to_jar_p = "/Users/clairekelleher/Desktop/Thesis/Fromdesktop/stanford-parse
 path_to_models_jar_p = "/Users/clairekelleher/Desktop/Thesis/Fromdesktop/stanford-parser-full-2017-06-09/jars/stanford-parser-3.8.0-models.jar"
 dependency_parser = StanfordDependencyParser(path_to_jar=path_to_jar_p, path_to_models_jar=path_to_models_jar_p)
 pcfg_parser = stanford.StanfordParser(path_to_jar=path_to_jar_p, path_to_models_jar=path_to_models_jar_p)
+  
 
-#************************** --Parser-- ******************************
-#To do: Sort out using STANFORD PARSER!
+###############################################################################
+#               Used to Pre Process
+###############################################################################
 
-from nltk.chunk.regexp import RegexpParser
-
-grammar = '''
-    NP: {<DT>? <JJ>* <NN>*} # NP
-    P: {<IN>}           # Preposition
-    V: {<V.*>}          # Verb
-    PP: {<P> <NP>}      # PP -> P NP
-    VP: {<V> <NP|PP>*}  # VP -> V (NP|PP)*
-'''
-    
-reg_parser = RegexpParser(grammar)
 parser = stanford.StanfordParser(model_path="/Users/clairekelleher/Desktop/Thesis/Fromdesktop/stanford-parser-full-2017-06-09/lexparser.sh")
 lmtzr = WordNetLemmatizer()
+script_no=1 #Used to keep track of loop process
 
+###############################################################################
+#               In-Directory
+###############################################################################
 
-#        for subsubtree in subtree.subtrees():
-#            if subsubtree.label() == "PRP":
-#                print(subsubtree)
-#def file_len(fname):
-#    with open(fname) as f:
-#        for i, l in enumerate(f):
-#            pass
-#        return i + 1
-#********************** --Create read in fn-- ******************
-script_no=1
-#fname = "002-0.cex"
 indir = '/Users/clairekelleher/Desktop/Thesis/Data/PItt_cookie_all_indf_IF'
+
+###############################################################################
+#               Main: Loops over each transcript once in indir 
+###############################################################################
 
 for root, dirs, filenames in os.walk(indir):
     try:
